@@ -24,4 +24,3 @@ This script is written in Lua and is designed to be compatible with most modern,
 
 # 🛑 Disclaimer
 This script is intended for educational purposes and personal use. Use at your own risk. We are not responsible for any actions taken against your Roblox account as a result of using this script.
-Would you like me to generate a simple example usage section or add a licensing section (like MIT or GPL)?
