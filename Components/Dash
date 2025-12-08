@@ -1,1 +1,63 @@
+-- Animation ID to check for
+local animationId = 10479335397
+-- ID of the replacement animation
+local replacementAnimationId = 14351441234
+-- Playback settings
+local startTime = 0 
+local playbackSpeed = 1.4
+local playDuration = 1.7
 
+local player = game.Players.LocalPlayer
+
+-- Create the replacement animation instance once
+local replacementAnimInstance = Instance.new("Animation")
+replacementAnimInstance.AnimationId = "rbxassetid://" .. replacementAnimationId
+
+-- Function to handle the animation logic
+local function onAnimationPlayed(humanoid, animationTrack)
+    -- Check if the played animation's ID matches the one we want to stop/replace
+    if animationTrack.Animation and animationTrack.Animation.AnimationId == "rbxassetid://" .. animationId then
+
+        -- Stop all currently playing animation tracks on the humanoid
+        for _, animTrack in pairs(humanoid:GetPlayingAnimationTracks()) do
+            animTrack:Stop()
+        end
+
+        -- Load the replacement animation track for the NEW humanoid
+        local replacementAnimTrack = humanoid:LoadAnimation(replacementAnimInstance)
+        
+        -- Play the replacement animation
+        replacementAnimTrack:Play()
+        
+        -- Set the time position and speed
+        replacementAnimTrack.TimePosition = startTime
+        replacementAnimTrack:AdjustSpeed(playbackSpeed)
+
+        -- Stop the replacement animation after a set duration
+        task.delay(playDuration, function()
+            replacementAnimTrack:Stop()
+        end)
+    end
+end
+
+-- Function to set up the script for a newly loaded character
+local function setupCharacter(character)
+    -- Wait for the new Humanoid
+    local humanoid = character:WaitForChild("Humanoid")
+    
+    -- Connect the onAnimationPlayed function to the new humanoid's event
+    -- We use an anonymous function wrapper to pass the 'humanoid' as an argument
+    humanoid.AnimationPlayed:Connect(function(animationTrack)
+        onAnimationPlayed(humanoid, animationTrack)
+    end)
+end
+
+-- 1. Run setup for the character that is currently loaded (if any)
+if player.Character then
+    setupCharacter(player.Character)
+end
+
+-- 2. Connect the setup function to the CharacterAdded event to handle future spawns (after death)
+player.CharacterAdded:Connect(setupCharacter)
+
+print("Loaded Dash.")   
