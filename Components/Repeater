@@ -1,0 +1,20 @@
+-- Load first script
+local seq1 = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/Components/Sequence-One",
+    true
+))
+
+-- Run first script
+seq1()
+
+-- Wait a moment to ensure it's done (adjust if needed)
+task.wait(0.5)
+
+-- Load second script
+local seq2 = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/Components/Sequence-two",
+    true
+))
+
+-- Run second script
+seq2()
