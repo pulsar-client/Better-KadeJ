@@ -1,1 +1,63 @@
 
+-- LocalScript
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- Function to set up the character when it loads
+local function setupCharacter(character)
+    local humanoid = character:WaitForChild("Humanoid")
+
+    local replacementAnimations = {
+        -- Key is the ID of the animation you want to REPLACE (e.g., default side-dash trigger ID)
+        -- Value is your custom animation data
+        ["10480796021"] = {Id = "rbxassetid://13498249507", Speed = 1.6}, -- Example Left Dash ID
+        ["10480793962"] = {Id = "rbxassetid://13498239823", Speed = 1.6}, -- Example Right Dash ID
+    }
+
+    local function onAnimationPlayed(animationTrack)
+        if not animationTrack.Animation then return end
+
+        -- Extract only the numeric ID from the AnimationId string
+        local animationId = animationTrack.Animation.AnimationId:match("%d+") 
+        local replacementData = replacementAnimations[animationId]
+
+        if replacementData then
+            -- 1. Stop the original animation track (the one that triggered the event)
+            animationTrack:Stop() 
+
+            -- 2. Create and load the replacement animation
+            local newAnimation = Instance.new("Animation")
+            newAnimation.AnimationId = replacementData.Id
+            local newTrack = humanoid:LoadAnimation(newAnimation)
+
+            -- ⭐ 3. THE FIX: Set Priority to Action4 for MAXIMUM override ⭐
+            -- This ensures the Walking/Movement animation is completely ignored 
+            -- while the side-dash is playing on the character's limbs.
+            newTrack.Priority = Enum.AnimationPriority.Action4 
+            
+            -- Set to false so it plays once and stops (like a dash)
+            newTrack.Looped = false 
+            
+            -- 4. Play the new animation and adjust speed
+            newTrack:Play()
+            newTrack:AdjustSpeed(replacementData.Speed)
+        end
+    end
+
+    -- Connect the function to the event that fires when any animation is played on the humanoid
+    humanoid.AnimationPlayed:Connect(onAnimationPlayed)
+end
+
+-- Handle the current character (if it exists)
+if player.Character then
+    setupCharacter(player.Character)
+end
+
+-- Handle future characters (for respawns)
+player.CharacterAdded:Connect(setupCharacter)
+player.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+    humanoid = newCharacter:WaitForChild("Humanoid")
+    humanoid.AnimationPlayed:Connect(onAnimationPlayed)
+end)
