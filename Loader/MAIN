@@ -31,7 +31,11 @@ end
 -- SCRIPT LIST
 -- ============================================================
 local scripts = {
-    {name="EXAMPLE", url="EXAMPLE"},
+    {name="KJ", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/Components/Repeater"},
+    {name="Changer", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Changer"},
+    {name="Buffer", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Buffer"},
+    {name="Dash", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/Components/Dash"},
+    {name="Side-dash", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/Components/Side-dash"},
 }
 
 -- ============================================================
