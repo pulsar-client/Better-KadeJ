@@ -1,1 +1,183 @@
-WIP
+-- ============================================================
+-- CONFIG
+-- ============================================================
+local NotificationLibrary = loadstring(game:HttpGet(
+    "https://raw.githubusercontent.com/IceMinisterq/Notification-Library/Main/Library.lua"
+))()
+
+local retryCount = 2          -- retries per script
+local delayBetween = 0.01     -- delay between scripts
+local silentMode = false      -- notification toggle
+
+-- ============================================================
+-- UTILITIES
+-- ============================================================
+local function sendNotification(type, message, time)
+    if not silentMode then
+        NotificationLibrary:SendNotification(type, message, time)
+    end
+end
+
+local function coloredPrint(msg, tag)
+    print("[" .. tag .. "] " .. msg)
+end
+
+-- Faster wrapper to reduce overhead
+local function fastHttp(url)
+    return game:HttpGet(url, true)
+end
+
+-- ============================================================
+-- SCRIPT LIST
+-- ============================================================
+local scripts = {
+    {name="EXAMPLE", url="EXAMPLE"},
+}
+
+-- ============================================================
+-- TRACKERS
+-- ============================================================
+local successList = {}
+local failedList = {}
+local totalStart = tick()
+
+-- ============================================================
+-- SCRIPT LOADER (ITERATIVE + OPTIMIZED)
+-- ============================================================
+local function loadScript(scriptData)
+    for attempt = 1, retryCount + 1 do
+        local startTick = tick()
+        local tag = string.format("%s (Attempt %d)", scriptData.name, attempt)
+        
+        coloredPrint("Loading: " .. tag, "Info")
+
+        local success, result = pcall(function()
+            local content = fastHttp(scriptData.url)
+            local fn = loadstring(content)
+
+            if not fn then
+                error("loadstring failed (syntax error?)")
+            end
+
+            return fn()
+        end)
+
+        local loadTime = string.format("%.2f", tick() - startTick)
+
+        -- success
+        if success then
+            table.insert(successList, {name = scriptData.name, time = loadTime})
+            coloredPrint("Loaded " .. scriptData.name .. " in " .. loadTime .. "s", "Success")
+            sendNotification("Success", "Loaded: " .. scriptData.name .. " (" .. loadTime .. "s)", 3)
+            return
+        end
+
+        -- failure
+        coloredPrint("Error loading " .. scriptData.name .. ": " .. tostring(result), "Error")
+
+        if attempt <= retryCount then
+            coloredPrint("Retrying " .. scriptData.name, "Warning")
+            sendNotification("Warning", "Retrying: " .. scriptData.name, 2)
+            task.wait(0.35)
+        else
+            table.insert(failedList, {name = scriptData.name, error = result})
+        end
+    end
+end
+
+-- ============================================================
+-- MAIN LOOP
+-- ============================================================
+for i, scriptData in ipairs(scripts) do
+    coloredPrint(string.format("(%d/%d) %s", i, #scripts, scriptData.name), "Info")
+    loadScript(scriptData)
+    task.wait(delayBetween)
+end
+
+-- ============================================================
+-- SUMMARY
+-- ============================================================
+local totalTime = string.format("%.2f", tick() - totalStart)
+sendNotification("Info",
+    string.format("Loading complete! Success: %d | Failed: %d | Time: %ss",
+    #successList, #failedList, totalTime), 6
+)
+
+coloredPrint("=== SUMMARY ===", "Info")
+
+for _, s in ipairs(successList) do
+    coloredPrint(string.format("[✔] %s | %ss", s.name, s.time), "Success")
+end
+
+for _, f in ipairs(failedList) do
+    coloredPrint(string.format("[✘] %s | Error: %s", f.name, tostring(f.error)), "Error")
+end    coloredPrint("[✘] Failed to load: " .. script.name .. " | Error: " .. tostring(result), "Error")
+    sendNotification("Error", "Failed: " .. script.name, 3)
+
+    if attempt < retryCount then
+        coloredPrint("Retrying script ("..(attempt+1).."): " .. script.name, "Warning")
+        sendNotification("Warning", "Retrying: " .. script.name .. " (Attempt "..(attempt+1)..")", 3)
+        task.wait(0.5)
+        return loadScript(script, attempt + 1)
+    end
+
+    -- Final fail
+    table.insert(failedList, {name = script.name, error = result})
+end
+
+-- ===========================
+-- MAIN LOOP
+-- ===========================
+for i, script in ipairs(scripts) do
+    coloredPrint(string.format("Loading script %d/%d", i, #scripts), "Info")
+    loadScript(script)
+    task.wait(delayBetween)
+end
+
+-- ===========================
+-- SUMMARY
+-- ===========================
+local totalTime = string.format("%.2f", tick() - totalStartTime)
+local summaryMessage = string.format(
+    "Scripts loaded: %d | Failed: %d | Total time: %ss",
+    #successList, #failedList, totalTime
+)
+
+sendNotification("Info", "Script loading complete! " .. summaryMessage, 5)
+
+coloredPrint("=== SCRIPT LOADING SUMMARY ===", "Info")
+for _, s in ipairs(successList) do
+    coloredPrint("[✔] Loaded: " .. s.name .. " | Time: " .. s.time .. "s", "Success")
+end
+
+for _, f in ipairs(failedList) do
+    coloredPrint("[✘] Failed: " .. f.name .. " | Error: " .. tostring(f.error), "Error")
+end        else
+            table.insert(failedList, {name=script.name, error=result})
+        end
+    end
+end
+
+-- ===========================
+-- MAIN LOOP
+-- ===========================
+for index, script in ipairs(scripts) do
+    coloredPrint(string.format("Loading script %d/%d", index, #scripts), "Info")
+    loadScript(script)
+    wait(delayBetween)
+end
+
+-- ===========================
+-- SUMMARY
+-- ===========================
+local totalTime = string.format("%.2f", tick() - totalStartTime)
+local summaryMessage = string.format("Scripts loaded: %d | Failed: %d | Total time: %ss", #successList, #failedList, totalTime)
+sendNotification("Info", "Script loading complete! " .. summaryMessage, 5)
+
+coloredPrint("=== SCRIPT LOADING SUMMARY ===", "Info")
+for _, s in ipairs(successList) do
+    coloredPrint("[✔] Loaded: " .. s.name .. " | Time: " .. s.time .. "s", "Success")
+end
+for _, f in ipairs(failedList) do
+    coloredPrint("[✘] Failed: " .. f.name .. " | Error: " .. f.error, "Error")
+end
