@@ -1,0 +1,162 @@
+-- // 1. SERVICES // --
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+
+-- // 2. VARIABLES & SETUP // --
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+-- We define character variables inside the main loop to ensure they update on respawn
+
+-- KeyCode Mapping (The part the original dev hated, but organized)
+local KeyMap = {
+    [1] = Enum.KeyCode.One,
+    [2] = Enum.KeyCode.Two,
+    [3] = Enum.KeyCode.Three,
+    [4] = Enum.KeyCode.Four,
+}
+
+-- // 3. CONNECTION MANAGER (Prevents script overlap in Delta) // --
+getgenv().INPUTBUFFER = getgenv().INPUTBUFFER or {}
+
+local function DisconnectOldConnections()
+    for _, connection in pairs(getgenv().INPUTBUFFER) do
+        if typeof(connection) == "RBXScriptConnection" then
+            connection:Disconnect()
+        end
+    end
+    getgenv().INPUTBUFFER = {}
+end
+
+local function TrackConnection(connection)
+    local id = tostring(#getgenv().INPUTBUFFER + 1)
+    getgenv().INPUTBUFFER[id] = connection
+    return connection
+end
+
+-- Clear old signals before starting
+DisconnectOldConnections()
+
+-- // 4. MAIN LOGIC // --
+local function StartInputHandler()
+    local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+    local Backpack = LocalPlayer:WaitForChild("Backpack")
+    local Communicate = Character:WaitForChild("Communicate", 5) -- Timeout of 5s
+    
+    if not Communicate then return warn("Could not find Communicate Remote!") end
+
+    local Moves = {}
+    
+    -- Initialize Hotbar Buttons
+    for i = 1, 4 do
+        -- Ensure the GUI exists
+        local hotbarFrame = PlayerGui:FindFirstChild("Hotbar") and PlayerGui.Hotbar:FindFirstChild("Backpack")
+        if not hotbarFrame then return end
+        
+        local buttonBase = hotbarFrame.Hotbar[tostring(i)].Base
+        
+        Moves[i] = {
+            holdingKey = false, 
+            holdingMouse = false, 
+            button = buttonBase
+        }
+    end
+
+    -- Input Listeners
+    for i, move in pairs(Moves) do
+        -- A. PC Keyboard Input
+        TrackConnection(UserInputService.InputBegan:Connect(function(input, gameProcessed)
+            if gameProcessed then return end
+            if input.UserInputType == Enum.UserInputType.Keyboard then
+                if input.KeyCode == KeyMap[i] then
+                    move.holdingKey = true
+                end
+            end
+        end))
+
+        TrackConnection(UserInputService.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.Keyboard then
+                if input.KeyCode == KeyMap[i] then
+                    move.holdingKey = false
+                end
+            end
+        end))
+
+        -- B. Mouse (PC) & Touch (Mobile) Input on GUI
+        TrackConnection(move.button.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                move.holdingMouse = true 
+            end
+        end))
+
+        TrackConnection(move.button.InputEnded:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                move.holdingMouse = false 
+            end
+        end))
+    end
+
+    -- Render Loop (The "Hold" Logic)
+    TrackConnection(RunService.RenderStepped:Connect(function()
+        for i, move in pairs(Moves) do
+            local btn = move.button
+            local reuseParams = btn:FindFirstChild("Reuse")
+            
+            -- Save old state if not saved yet
+            if move.oldstate == nil and reuseParams then
+                move.oldstate = {
+                    Visible = reuseParams.Visible, 
+                    Text = reuseParams.Text
+                }
+            end
+
+            -- If holding input, modify UI and Fire Remote
+            if move.holdingKey or move.holdingMouse then
+                if reuseParams then
+                    reuseParams.Visible = true 
+                    reuseParams.Text = "HELD"
+                    
+                    if reuseParams:FindFirstChild("Reuse") then
+                        reuseParams.Reuse.Visible = true
+                        reuseParams.Reuse.Text = "HELD"
+                    end
+                end
+
+                -- The Tool Logic
+                if Backpack:FindFirstChild(btn.ToolName.Text) then
+                    local args = {
+                        [1] = {
+                            ["Goal"] = "Console Move",
+                            ["Tool"] = Backpack[btn.ToolName.Text]
+                        }
+                    }
+                    Communicate:FireServer(unpack(args))
+                end
+            else
+                -- Restore UI
+                if move.oldstate and reuseParams then
+                    reuseParams.Text = move.oldstate.Text
+                    reuseParams.Visible = move.oldstate.Visible
+                    
+                    if reuseParams:FindFirstChild("Reuse") then
+                        reuseParams.Reuse.Text = move.oldstate.Text
+                    end
+                end
+            end
+        end
+    end))
+end
+
+-- // 5. INITIALIZATION // --
+StartInputHandler()
+
+-- Auto-restart on Respawn
+LocalPlayer.CharacterAdded:Connect(function(char)
+    local hum = char:WaitForChild("Humanoid", 10)
+    if hum then
+        task.wait(0.5) -- Small delay to ensure tools load
+        DisconnectOldConnections() -- Clear old connections from previous life
+        StartInputHandler()
+    end
+end)
