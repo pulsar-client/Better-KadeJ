@@ -8,7 +8,7 @@ local ForceShirtID = 97162082274032 -- âœ… Classic or UGC shirt ID (numbers 
 -- Accessories / Faces
 local face = 0
 local hair = 0
-local AnyAccessory1 = 0
+local AnyAccessory1 = 123734819275249
 local AnyAccessory2 = 0
 local AnyAccessory3 = 0
 local AnyAccessory4 = 0
