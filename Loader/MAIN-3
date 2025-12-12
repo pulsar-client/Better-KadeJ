@@ -14,7 +14,7 @@ if not success then
     NotificationLibrary = { SendNotification = function() end }
 end
 
-local retryCount = 30         -- retries per script
+local retryCount = 2        -- retries per script
 local delayBetween = 0.05     -- delay between scripts (slightly increased for stability)
 local silentMode = false      -- notification toggle
 
@@ -43,7 +43,6 @@ end
 -- SCRIPT LIST
 -- ============================================================
 local scripts = {
-    {name="Gojo", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/Components/Gojo"}, -- A
     {name="Gojo-fier", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Gojo-fier"},
     {name="Buffer", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Buffer"},
     {name="Dash", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/Components/Dash"},
