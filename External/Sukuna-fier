@@ -2,7 +2,7 @@
 -- // === SETTINGS === \\ --
 
 local DeleteAllAccessories = "Yes" -- "Yes" or "No"
-local ForcePantsID = 14896164672          
+local ForcePantsID = 16205199352          
 local ForceShirtID = 110585119938788  -- âœ… Classic or UGC shirt ID (numbers only)
 
 -- Accessories / Faces
