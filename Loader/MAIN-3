@@ -43,7 +43,7 @@ end
 -- SCRIPT LIST
 -- ============================================================
 local scripts = {
-    {name="Gojo", url=""}, -- A
+    {name="Gojo", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/Components/Gojo"}, -- A
     {name="Gojo-fier", url=""},
     {name="Buffer", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Buffer"},
     {name="Dash", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/Components/Dash"},
