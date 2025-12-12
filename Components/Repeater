@@ -8,7 +8,7 @@ local seq1 = loadstring(game:HttpGet(
 seq1()
 
 -- Wait a moment to ensure it's done (adjust if needed)
-task.wait(0.5)
+task.wait(13)
 
 -- Load second script
 local seq2 = loadstring(game:HttpGet(
