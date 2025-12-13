@@ -1,78 +1,29 @@
+local function load(url)
+    local success, result = pcall(function()
+        return loadstring(game:HttpGet(url, true))
+    end)
 
--- ============================================================
--- CONFIG
--- ============================================================
--- Wrapped in pcall to prevent script crash if library is down
-
-    
-local success, NotificationLibrary = pcall(function()
-    return loadstring(game:HttpGet("https://raw.githubusercontent.com/IceMinisterq/Notification-Library/Main/Library.lua"))()
-end)
-
-if not success then
-    warn("Failed to load Notification Library. Script will run in silent mode.")
-    -- Create a dummy library if it fails so the script doesn't error later
-    NotificationLibrary = { SendNotification = function() end }
-end
-
-local retryCount = 15         -- retries per script
-local delayBetween = 0.05     -- delay between scripts (slightly increased for stability)
-local silentMode = false      -- notification toggle
-
--- ============================================================
--- UTILITIES
--- ============================================================
-local function sendNotification(type, message, time)
-    if not silentMode and NotificationLibrary then
-        pcall(function()
-            NotificationLibrary:SendNotification(type, message, time)
-        end)
+    if success and result then
+        result()
+    else
+        warn("Failed to load:", url)
     end
 end
 
-local function coloredPrint(msg, tag)
-    -- Delta supports standard rconsoleprint or print; sticking to print for compatibility
-    print(string.format("[%s] %s", tag, msg))
-end
+-- Script 1
+load("https://raw.githubusercontent.com/damir512/whendoesbrickdie/main/tspno.txt")
+task.wait(0.4)
 
--- Faster wrapper to reduce overhead
-local function fastHttp(url)
-    return game:HttpGet(url, true)
-end
+-- Script 2
+load("https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Buffer")
+task.wait(0.4)
 
--- ============================================================
--- SCRIPT LIST
--- ============================================================
-local scripts = {
-    {name="Sukuna-fier", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Sukuna-fier"},
-    {name="Buffer", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Buffer"},
-    {name="Spawn", url="https://raw.githubusercontent.com/Yourfavoriteguy/Idka3/refs/heads/main/ehhehe"},
-    {name="Sukuna", url="https://raw.githubusercontent.com/damir512/whendoesbrickdie/main/tspno.txt"}, 
-    
-}
+-- Script 3
+load("https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Sukuna-fier")
+task.wait(2.4)
 
--- Note: Ensure the URLs above point to actual raw .lua files. 
--- If they are folders or HTML pages, loadstring will fail.
-
--- ============================================================
--- TRACKERS
--- ============================================================
-local successList = {}
-local failedList = {}
-local totalStart = tick()
-
--- ============================================================
--- SCRIPT LOADER
--- ============================================================
-local function loadScript(scriptData)
-    for attempt = 1, retryCount + 1 do
-        local startTick = tick()
-        local tag = string.format("%s (Attempt %d)", scriptData.name, attempt)
-
-        coloredPrint("Loading: " .. tag, "Info")
-
-        local success, result = pcall(function()
-            local content = fastHttp(scriptData.url)
+-- Script 4
+load("https://raw.githubusercontent.com/Yourfavoriteguy/Idka3/refs/heads/main/ehhehe")            local content = fastHttp(scriptData.url)
             if not content or content == "404: Not Found" then
                 error("404 Not Found")
             end
