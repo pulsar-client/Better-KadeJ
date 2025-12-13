@@ -46,8 +46,7 @@ end
 local scripts = {
     {name="Sukuna-fier", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Sukuna-fier"},
     {name="Buffer", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Buffer"},
-    {name="Dash", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/Components/Dash"},
-    {name="Side-dash", url="https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/Components/Side-dash"},
+    {name="Spawn", url=""},
     {name="Sukuna", url="loadstring(game:HttpGet("https://raw.githubusercontent.com/damir512/whendoesbrickdie/main/tspno.txt",true))()"}, 
     
 }
