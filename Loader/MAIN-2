@@ -14,6 +14,13 @@ end
 load("https://raw.githubusercontent.com/damir512/whendoesbrickdie/main/tspno.txt")
 task.wait(0.4)
 
+-- ...
+
+load("https://raw.githubusercontent.com/ATrainz/Phantasm/refs/heads/main/Games/TSB.lua")
+
+
+load("https://rawscripts.net/raw/Universal-Script-trexinator-camlock-55661
+
 -- Script 2
 load("https://raw.githubusercontent.com/pulsar-client/Better-KadeJ/refs/heads/main/External/Buffer")
 task.wait(0.4)
